@@ -1,0 +1,94 @@
+name: "resnet50"
+platform: "ensemble"
+
+input [
+  {
+    name: "RAW_INPUT"
+    data_type: TYPE_UINT8
+    dims: [ -1,-1,3 ]
+  }
+]
+output [
+  {
+    name: "SCORES"
+    data_type: TYPE_FP32
+    dims: [ -1 ]
+  }
+]
+
+ensemble_scheduling {
+  step [
+    {
+      model_name: "resnet50_config"
+      model_version: 1
+      input_map {
+        key: "raw_input"
+        value: "RAW_INPUT"
+      },
+      output_map {
+        key: "raw_input"
+        value: "RAW_INPUT_BYPASS"
+      },
+      output_map {
+        key: "input_size"
+        value: "INPUT_SIZE"
+      },
+      output_map {
+        key: "img_mean"
+        value: "IMG_MEAN"
+      },
+      output_map {
+        key: "img_std"
+        value: "IMG_STD"
+      },
+    },
+    {
+      model_name: "image_preprocessor"
+      model_version: 1
+      input_map {
+        key: "raw_input"
+        value: "RAW_INPUT_BYPASS"
+      },
+      input_map {
+        key: "input_size"
+        value: "INPUT_SIZE"
+      },
+      input_map {
+        key: "img_mean"
+        value: "IMG_MEAN"
+      },
+      input_map {
+        key: "img_std"
+        value: "IMG_STD"
+      },
+      output_map {
+        key: "tensor"
+        value: "preprocessed_input"
+      }
+    },
+    {
+      model_name: "resnet50_onnx"
+      model_version: 1
+      input_map {
+        key: "input"
+        value: "preprocessed_input"
+      },
+      output_map {
+        key: "output"
+        value: "model_output"
+      }
+    },
+    {
+      model_name: "classifier_postprocessor"
+      model_version: 1
+      input_map {
+        key: "model_output"
+        value: "model_output"
+      },
+      output_map {
+        key: "scores"
+        value: "SCORES"
+      }
+    }
+  ]
+}

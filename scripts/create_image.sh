@@ -1,0 +1,1 @@
+docker build --tag nvcr.io/nvidia/tritonserver:24.10-py3-opencv .
