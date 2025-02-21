@@ -26,7 +26,12 @@ class TritonPythonModel:
 
             responses.append(
                 pb_utils.InferenceResponse(
-                    output_tensors=[input_tensor, input_size, img_mean, img_std]
+                    output_tensors=[
+                        input_tensor,
+                        input_size,
+                        img_mean,
+                        img_std,
+                    ]
                 )
             )
 
