@@ -1,11 +1,10 @@
-import cv2
 import numpy as np
 
 import triton_python_backend_utils as pb_utils
 
 
 def softmax(arr: np.ndarray, axis: int = -1) -> np.ndarray:
-    max_value = np.max(arr, axis=axis)
+    max_value = np.max(arr, axis=axis, keepdims=True)
     arr -= max_value
 
     numerator = np.exp(arr - max_value)
@@ -21,7 +20,6 @@ class TritonPythonModel:
             input_tensor = pb_utils.get_input_tensor_by_name(request, "model_output")
             input_data = input_tensor.as_numpy()
 
-            input_data = np.squeeze(input_data)
             scores = softmax(input_data, axis=-1)
 
             output_tensor = pb_utils.Tensor("scores", scores.astype(np.float32))

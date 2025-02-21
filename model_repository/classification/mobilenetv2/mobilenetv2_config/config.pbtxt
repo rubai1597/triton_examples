@@ -1,6 +1,17 @@
 name: "mobilenetv2_config"
 backend: "python"
 
+max_batch_size: 8
+instance_group [
+  {
+    kind: KIND_CPU
+  }
+]
+dynamic_batching {
+  preferred_batch_size: [ 4, 8 ]
+  max_queue_delay_microseconds: 100
+}
+
 input [
   {
     name: "raw_input"

@@ -9,14 +9,19 @@ class TritonPythonModel:
         for request in requests:
             input_tensor = pb_utils.get_input_tensor_by_name(request, "raw_input")
 
-            input_size = pb_utils.Tensor("input_size", np.array((224, 224), np.uint32))
+            input_tensor_shape = input_tensor.shape()
+            batch_size = input_tensor_shape[0]
+
+            input_size = pb_utils.Tensor(
+                "input_size", np.array([[224, 224]] * batch_size, np.uint32)
+            )
             img_mean = pb_utils.Tensor(
                 "img_mean",
-                np.array((0.485, 0.456, 0.406), np.float32),
+                np.array([[0.485, 0.456, 0.406]] * batch_size, np.float32),
             )
             img_std = pb_utils.Tensor(
                 "img_std",
-                np.array((0.229, 0.224, 0.225), np.float32),
+                np.array([[0.229, 0.224, 0.225]] * batch_size, np.float32),
             )
 
             responses.append(
